@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockDAG Reputation Passport</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); min-height: 100vh; color: #fff; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; padding: 40px 20px; }
+        .header h1 { font-size: 28px; color: #00d4ff; margin-bottom: 10px; }
+        .header p { color: #888; font-size: 14px; }
+        .card { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 24px; margin: 16px 0; border: 1px solid rgba(255,255,255,0.1); }
+        .card h2 { font-size: 18px; color: #00d4ff; margin-bottom: 12px; }
+        .card p { color: #aaa; font-size: 14px; line-height: 1.6; }
+        .badge { display: inline-block; background: rgba(0,212,255,0.15); color: #00d4ff; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; margin-top: 10px; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .stat { background: rgba(0,212,255,0.1); border-radius: 12px; padding: 16px; text-align: center; }
+        .stat .value { font-size: 24px; font-weight: bold; color: #00d4ff; }
+        .stat .label { font-size: 12px; color: #888; margin-top: 4px; }
+        .btn { display: block; width: 100%; background: linear-gradient(135deg, #00d4ff 0%, #0066ff 100%); color: #fff; text-align: center; padding: 16px; border-radius: 12px; font-weight: 600; text-decoration: none; margin-top: 20px; }
+        .footer { text-align: center; padding: 30px 20px; color: #555; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>BlockDAG</h1>
+            <p>Reputation Passport</p>
+        </div>
+        <div class="card">
+            <h2>Your Reputation Score</h2>
+            <div class="stats">
+                <div class="stat">
+                    <div class="value">94%</div>
+                    <div class="label">Trust Score</div>
+                </div>
+                <div class="stat">
+                    <div class="value">12</div>
+                    <div class="label">Verified Actions</div>
+                </div>
+            </div>
+            <span class="badge">Elite Member</span>
+            <p style="margin-top: 16px;">Your reputation is built on verified on-chain activities, community contributions, and trusted interactions within the BlockDAG ecosystem.</p>
+        </div>
+        <div class="card">
+            <h2>Recent Activity</h2>
+            <p>Transaction verified on BlockDAG mainnet</p>
+            <p style="margin-top: 8px;">Community governance vote submitted</p>
+            <p style="margin-top: 8px;">Referral network expanded (+3 members)</p>
+        </div>
+        <a href="#" class="btn">View Full Profile</a>
+        <div class="footer">
+            BlockDAG Reputation Passport - Prototype v1.0
+        </div>
+    </div>
+</body>
+</html>
