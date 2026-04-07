@@ -1,486 +1,846 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BlockDAG Reputation Passport v3.3</title>
-  <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
-    color: #e6edf3;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
-  .star { position: absolute; width: 2px; height: 2px; background: rgba(255,255,255,0.5); border-radius: 50%; animation: twinkle 3s infinite; }
-  @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-  .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
-  .particle { position: absolute; width: 4px; height: 4px; background: rgba(0, 212, 255, 0.3); border-radius: 50%; animation: float 15s infinite; }
-  @keyframes float { 0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; } }
-  .container { max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 2; }
-  .header { text-align: center; padding: 40px 0; animation: fadeInDown 1s ease; }
-  @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-  .logo { font-size: 2.5em; font-weight: bold; background: linear-gradient(135deg, #00d4ff, #5865f2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 10px; text-shadow: 0 0 30px rgba(0, 212, 255, 0.5); }
-  .tagline { color: #8b949e; font-size: 1.1em; }
-  .card { background: rgba(22, 27, 34, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; margin-bottom: 20px; backdrop-filter: blur(10px); animation: fadeInUp 0.8s ease; transition: transform 0.3s, box-shadow 0.3s; }
-  .card:hover { transform: translateY(-5px); box-shadow: 0 10px 40px rgba(0, 212, 255, 0.15); }
-  @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-  .card-title { font-size: 1.3em; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: #f0f6fc; }
-  .card-title .icon { width: 24px; height: 24px; }
-  .btn { background: linear-gradient(135deg, #5865f2, #00d4ff); color: #fff; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1em; font-weight: 600; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; }
-  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4); }
-  .btn:active { transform: translateY(0); }
-  .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
-  .btn-danger { background: rgba(255,80,80,0.2); color: #ff5050; border: 1px solid rgba(255,80,80,0.3); }
-  .btn-wallet { background: linear-gradient(135deg, #5865f2, #7289da); color: #fff; }
-  .btn-verify { background: linear-gradient(135deg, #2ed573, #00d4ff); color: #fff; }
-  .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
-  .badge-verified { background: rgba(0, 212, 255, 0.2); color: #00d4ff; border: 1px solid rgba(0, 212, 255, 0.3); }
-  .badge-pending { background: rgba(255, 149, 0, 0.2); color: #ff9500; border: 1px solid rgba(255, 149, 0, 0.3); }
-  .badge-success { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
-  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
-  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
-  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  @media (max-width: 900px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 600px) { .grid-3 { grid-template-columns: 1fr; } }
-  .input-group { margin-bottom: 16px; }
-  .input-group label { display: block; margin-bottom: 8px; color: #8b949e; font-size: 0.9em; }
-  .input-group input, .input-group select { width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e6edf3; font-size: 1em; }
-  .input-group input:focus, .input-group select:focus { outline: none; border-color: #00d4ff; box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1); }
-  .wallet-section { text-align: center; padding: 20px; }
-  .wallet-qr { width: 180px; height: 180px; background: #fff; margin: 20px auto; border-radius: 12px; display: flex; align-items: center; justify-content: center; color: #000; font-size: 14px; overflow: hidden; }
-  .wallet-qr img { width: 100%; height: 100%; }
-  .wallet-address { font-family: monospace; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; word-break: break-all; font-size: 0.85em; color: #8b949e; }
-  .wallet-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
-  .wallet-stat { background: rgba(255,255,255,0.05); padding: 12px; border-radius: 8px; text-align: center; }
-  .wallet-stat .value { font-size: 1.3em; font-weight: bold; color: #00d4ff; }
-  .wallet-stat .label { font-size: 0.8em; color: #8b949e; }
-  .notification { position: fixed; top: 20px; right: 20px; background: rgba(22, 27, 34, 0.95); border: 1px solid rgba(0, 212, 255, 0.3); border-radius: 12px; padding: 16px 20px; z-index: 1000; animation: slideInRight 0.3s ease; display: flex; align-items: center; gap: 12px; }
-  @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-  .notification.hidden { opacity: 0; pointer-events: none; }
-  .activity-log { font-size: 0.85em; color: #8b949e; max-height: 150px; overflow-y: auto; }
-  .activity-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .activity-item:last-child { border-bottom: none; }
-  .utility-card { background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: center; transition: all 0.3s; cursor: pointer; }
-  .utility-card:hover { border-color: #00d4ff; transform: translateY(-3px); }
-  .utility-card .icon { font-size: 2.5em; margin-bottom: 12px; }
-  .utility-card h4 { color: #f0f6fc; margin-bottom: 8px; }
-  .utility-card p { color: #8b949e; font-size: 0.85em; }
-  .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-  .modal.active { opacity: 1; pointer-events: all; }
-  .modal-content { background: #161b22; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 30px; max-width: 450px; width: 90%; animation: scaleIn 0.3s ease; }
-  @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .modal-close { float: right; font-size: 1.5em; cursor: pointer; color: #8b949e; }
-  .modal-close:hover { color: #f0f6fc; }
-  .verification-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(46, 213, 115, 0.15); border: 1px solid rgba(46, 213, 115, 0.3); border-radius: 20px; color: #2ed573; font-size: 0.9em; }
-  .two-factor { border-left: 3px solid #ff9500; padding-left: 16px; }
-  .wallet-type-badge { display: inline-block; padding: 4px 8px; background: rgba(88, 101, 242, 0.2); color: #5865f2; border-radius: 4px; font-size: 0.75em; margin-top: 4px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockDAG Reputation Passport v3.4</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+            color: #e6edf3;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+        .star { position: absolute; width: 2px; height: 2px; background: rgba(255,255,255,0.5); border-radius: 50%; animation: twinkle 3s infinite; }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+        .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .particle { position: absolute; width: 4px; height: 4px; background: rgba(0, 212, 255, 0.3); border-radius: 50%; animation: float 15s infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(100vh) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(-100vh) rotate(720deg); opacity: 0; } }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; position: relative; z-index: 2; }
+        .header { text-align: center; padding: 40px 0; animation: fadeInDown 1s ease; }
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        /* === BLOCKDAG LOGO ANIMATION === */
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .bdag-logo {
+            width: 160px;
+            height: 160px;
+            animation: 
+                bdagFloat 4s ease-in-out infinite,
+                bdagGlow 3s ease-in-out infinite,
+                bdagRotate 20s linear infinite,
+                bdagPulse 2s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(0, 212, 255, 0.5))
+                    drop-shadow(0 0 40px rgba(88, 101, 242, 0.3));
+        }
+        @keyframes bdagFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-12px) scale(1.03); }
+        }
+        @keyframes bdagGlow {
+            0%, 100% {
+                filter: drop-shadow(0 0 15px rgba(0, 212, 255, 0.4))
+                        drop-shadow(0 0 30px rgba(88, 101, 242, 0.25))
+                        drop-shadow(0 0 60px rgba(0, 212, 255, 0.1));
+            }
+            50% {
+                filter: drop-shadow(0 0 25px rgba(0, 212, 255, 0.7))
+                        drop-shadow(0 0 50px rgba(88, 101, 242, 0.5))
+                        drop-shadow(0 0 80px rgba(0, 212, 255, 0.2));
+            }
+        }
+        @keyframes bdagRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes bdagPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.92; }
+        }
+        .logo-text {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff, #5865f2, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            animation: textShimmer 3s ease-in-out infinite;
+        }
+        @keyframes textShimmer {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.15); }
+        }
+        .tagline {
+            color: #8b949e;
+            font-size: 1.1em;
+            animation: fadeIn 1.5s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .card {
+            background: rgba(22, 27, 34, 0.8);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            animation: fadeInUp 0.8s ease;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 40px rgba(0, 212, 255, 0.15); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .card-title { font-size: 1.3em; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; color: #f0f6fc; }
+        .card-title .icon { width: 24px; height: 24px; }
+        .btn {
+            background: linear-gradient(135deg, #5865f2, #00d4ff);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4); }
+        .btn:active { transform: translateY(0); }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; }
+        .btn-danger { background: rgba(255,80,80,0.2); color: #ff5050; border: 1px solid rgba(255,80,80,0.3); }
+        .btn-wallet { background: linear-gradient(135deg, #5865f2, #7289da); color: #fff; }
+        .btn-verify { background: linear-gradient(135deg, #2ed573, #00d4ff); color: #fff; }
+        .btn-share { background: linear-gradient(135deg, #00d4ff, #2ed573); color: #000; }
+        .badge { padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: 600; }
+        .badge-verified { background: rgba(0, 212, 255, 0.2); color: #00d4ff; border: 1px solid rgba(0, 212, 255, 0.3); }
+        .badge-pending { background: rgba(255, 149, 0, 0.2); color: #ff9500; border: 1px solid rgba(255, 149, 0, 0.3); }
+        .badge-success { background: rgba(46, 213, 115, 0.2); color: #2ed573; border: 1px solid rgba(46, 213, 115, 0.3); }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+        @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media (max-width: 900px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .grid-3 { grid-template-columns: 1fr; } }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #8b949e; font-size: 0.9em; }
+        .input-group input, .input-group select {
+            width: 100%; padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; color: #e6edf3; font-size: 1em;
+        }
+        .input-group input:focus, .input-group select:focus {
+            outline: none; border-color: #00d4ff;
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+        .wallet-section { text-align: center; padding: 20px; }
+        .wallet-qr {
+            width: 200px; height: 200px;
+            background: #fff;
+            margin: 20px auto;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 14px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.2);
+            transition: transform 0.3s;
+        }
+        .wallet-qr:hover { transform: scale(1.05); }
+        .wallet-qr img { width: 100%; height: 100%; }
+        .wallet-address {
+            font-family: monospace;
+            background: rgba(255,255,255,0.05);
+            padding: 10px; border-radius: 8px;
+            word-break: break-all;
+            font-size: 0.85em;
+            color: #8b949e;
+        }
+        .wallet-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+        .wallet-stat {
+            background: rgba(255,255,255,0.05);
+            padding: 12px; border-radius: 8px; text-align: center;
+        }
+        .wallet-stat .value { font-size: 1.3em; font-weight: bold; color: #00d4ff; }
+        .wallet-stat .label { font-size: 0.8em; color: #8b949e; }
+        .wallet-type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: rgba(88, 101, 242, 0.2);
+            color: #5865f2;
+            border-radius: 4px;
+            font-size: 0.75em;
+            margin-top: 4px;
+        }
+        .share-section {
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+        .share-input-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .share-input-group input {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 14px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            color: #e6edf3;
+        }
+        .qr-preview {
+            margin-top: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .qr-preview #qr-container { background: #fff; padding: 12px; border-radius: 12px; }
+        .notification {
+            position: fixed; top: 20px; right: 20px;
+            background: rgba(22, 27, 34, 0.95);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 16px 20px;
+            z-index: 1000;
+            animation: slideInRight 0.3s ease;
+            display: flex; align-items: center; gap: 12px;
+        }
+        @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .notification.hidden { opacity: 0; pointer-events: none; }
+        .activity-log { font-size: 0.85em; color: #8b949e; max-height: 150px; overflow-y: auto; }
+        .activity-item { padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .activity-item:last-child { border-bottom: none; }
+        .utility-card {
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 20px; text-align: center;
+            transition: all 0.3s; cursor: pointer;
+        }
+        .utility-card:hover { border-color: #00d4ff; transform: translateY(-3px); }
+        .utility-card .icon { font-size: 2.5em; margin-bottom: 12px; }
+        .utility-card h4 { color: #f0f6fc; margin-bottom: 8px; }
+        .utility-card p { color: #8b949e; font-size: 0.85em; }
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: flex;
+            align-items: center; justify-content: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal.active { opacity: 1; pointer-events: all; }
+        .modal-content {
+            background: #161b22; border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 30px; max-width: 450px; width: 90%;
+            animation: scaleIn 0.3s ease;
+        }
+        @keyframes scaleIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-close { float: right; font-size: 1.5em; cursor: pointer; color: #8b949e; }
+        .modal-close:hover { color: #f0f6fc; }
+        .verification-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 6px 12px;
+            background: rgba(46, 213, 115, 0.15);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+            border-radius: 20px; color: #2ed573; font-size: 0.9em;
+        }
+        .two-factor { border-left: 3px solid #ff9500; padding-left: 16px; }
+    
+            /* === INTRO ANIMATION === */
+        .intro-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, #1a1a2e 0%, #0d1117 50%, #000000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+        .intro-content {
+            text-align: center;
+            animation: introFadeIn 1s ease;
+        }
+        @keyframes introFadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .coin-wrapper {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .intro-coin {
+            width: 220px;
+            height: 220px;
+            object-fit: contain;
+            animation: coinSpin 8s linear infinite, coinPulse 3s ease-in-out infinite, coinFloat 4s ease-in-out infinite;
+            filter: drop-shadow(0 0 30px rgba(255, 215, 0, 0.6))
+                    drop-shadow(0 0 60px rgba(255, 215, 0, 0.3))
+                    drop-shadow(0 0 100px rgba(255, 215, 0, 0.15));
+            border-radius: 50%;
+        }
+        @keyframes coinSpin {
+            from { transform: rotateY(0deg); }
+            to { transform: rotateY(360deg); }
+        }
+        @keyframes coinPulse {
+            0%, 100% { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.5)) drop-shadow(0 0 50px rgba(255, 215, 0, 0.25)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 45px rgba(255, 215, 0, 0.8)) drop-shadow(0 0 90px rgba(255, 215, 0, 0.4)); transform: scale(1.05); }
+        }
+        @keyframes coinFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        .coin-glow-ring {
+            position: absolute;
+            width: 240px;
+            height: 240px;
+            border: 3px solid rgba(255, 215, 0, 0.3);
+            border-radius: 50%;
+            animation: ringPulse 2s ease-in-out infinite;
+        }
+        .coin-glow-ring.delay1 {
+            animation-delay: 0.5s;
+            width: 260px;
+            height: 260px;
+            border-color: rgba(255, 215, 0, 0.15);
+        }
+        .coin-glow-ring.delay2 {
+            animation-delay: 1s;
+            width: 280px;
+            height: 280px;
+            border-color: rgba(255, 215, 0, 0.08);
+        }
+        @keyframes ringPulse {
+            0%, 100% { transform: scale(0.9); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+        .intro-title {
+            font-size: 3.5em;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffd700, #ffed4a, #ffb300, #ffd700);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: goldShimmer 4s ease-in-out infinite, titleGlow 2s ease-in-out infinite;
+            text-shadow: 0 0 40px rgba(255, 215, 0, 0.4);
+            margin-bottom: 20px;
+        }
+        @keyframes goldShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.3); }
+        }
+        .intro-words {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .intro-words .word {
+            font-size: 1.1em;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: rgba(255, 215, 0, 0.7);
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+            opacity: 0;
+            animation: wordAppear 0.8s ease forwards;
+        }
+        .word1 { animation-delay: 0.5s; }
+        .word2 { animation-delay: 1.2s; }
+        .word3 { animation-delay: 1.9s; }
+        @keyframes wordAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .intro-subtitle {
+            font-size: 1.3em;
+            color: #8b949e;
+            margin-bottom: 30px;
+            opacity: 0;
+            animation: subtitleFadeIn 0.8s ease forwards 2.5s;
+        }
+        @keyframes subtitleFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .intro-btn {
+            background: linear-gradient(135deg, #ffd700, #ffb300);
+            color: #000;
+            border: none;
+            padding: 16px 40px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            opacity: 0;
+            animation: btnFadeIn 0.8s ease forwards 3.2s;
+            transition: all 0.3s;
+        }
+        .intro-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.4);
+        }
+        @keyframes btnFadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 600px) {
+            .intro-coin { width: 160px; height: 160px; }
+            .coin-wrapper { width: 200px; height: 200px; }
+            .coin-glow-ring { width: 180px; height: 180px; }
+            .coin-glow-ring.delay1 { width: 200px; height: 200px; }
+            .coin-glow-ring.delay2 { width: 220px; height: 220px; }
+            .intro-title { font-size: 2.5em; }
+            .intro-words .word { font-size: 0.95em; }
+        }
+</style>
 </head>
 <body>
-  <div class="stars" id="stars"></div>
-  <div class="particles" id="particles"></div>
-  <div class="container">
-    <header class="header">
-      <h1 class="logo">BlockDAG Reputation Passport</h1>
-      <p class="tagline">Your verified identity & utility hub in the BlockDAG ecosystem</p>
-    </header>
-
-    <div class="card">
-      <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Profile</h2>
-      <div class="input-group">
-        <label>Display Name</label>
-        <input type="text" id="display-name" placeholder="Enter your display name">
-      </div>
-      <div class="input-group">
-        <label>BlockDAG Wallet Address</label>
-        <input type="text" id="wallet-address" placeholder="0x..." readonly>
-      </div>
-      <button class="btn" onclick="saveProfile()">Save Profile</button>
-      <span id="profile-saved" class="verification-badge" style="display:none;margin-left:10px;">Saved!</span>
+    <div class="intro-overlay" id="introOverlay">
+        <div class="intro-content">
+            <div class="coin-wrapper">
+                <div class="coin-glow-ring"></div>
+                <div class="coin-glow-ring delay1"></div>
+                <div class="coin-glow-ring delay2"></div>
+                <img src="https://i.imgur.com/blockdag-gold-coin.png" alt="BlockDAG" class="intro-coin" id="introCoin">
+            </div>
+            <h1 class="intro-title">BlockDAG</h1>
+            <div class="intro-words">
+                <span class="word word1">SPEED</span>
+                <span class="word word2">SCALABILITY</span>
+                <span class="word word3">SECURITY</span>
+            </div>
+            <p class="intro-subtitle">The Future of Blockchain is Here</p>
+            <button class="intro-btn" onclick="closeIntro()">Enter Passport</button>
+        </div>
     </div>
-
-    <div class="card">
-      <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H8.9V6z"/></svg> Two-Factor Authentication</h2>
-      <div class="two-factor">
-        <div class="input-group">
-          <label>Email</label>
-          <input type="email" id="2fa-email" placeholder="your@email.com">
+    <div class="stars" id="stars"></div>
+    <div class="particles" id="particles"></div>
+    <div class="container">
+        <header class="header">
+            <div class="logo-container">
+                <img src="https://i.imgur.com/YOUR_LOGO.png" alt="BlockDAG Logo" class="bdag-logo" id="bdagLogo">
+                <h1 class="logo-text">BlockDAG Reputation Passport</h1>
+                <p class="tagline">Your verified identity & utility hub in the BlockDAG ecosystem</p>
+            </div>
+        </header>
+        <div class="card">
+            <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg> Profile</h2>
+            <div class="input-group">
+                <label>Display Name</label>
+                <input type="text" id="display-name" placeholder="Enter your display name">
+            </div>
+            <div class="input-group">
+                <label>BlockDAG Wallet Address</label>
+                <input type="text" id="wallet-address" placeholder="0x..." readonly>
+            </div>
+            <button class="btn" onclick="saveProfile()">Save Profile</button>
+            <span id="profile-saved" class="verification-badge" style="display:none;margin-left:10px;">Saved!</span>
         </div>
-        <div class="input-group">
-          <label>Phone Number</label>
-          <input type="tel" id="2fa-phone" placeholder="+49 ...">
+        <div class="card">
+            <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm6-9h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM8.9 6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2H8.9V6z"/></svg> Two-Factor Authentication</h2>
+            <div class="two-factor">
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" id="2fa-email" placeholder="your@email.com">
+                </div>
+                <div class="input-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="2fa-phone" placeholder="+49 ...">
+                </div>
+                <button class="btn" onclick="enable2FA()">Enable 2FA</button>
+                <span id="2fa-status" class="badge badge-success" style="display:none;margin-left:10px;">2FA Enabled</span>
+            </div>
         </div>
-        <button class="btn" onclick="enable2FA()">Enable 2FA</button>
-        <span id="2fa-status" class="badge badge-success" style="display:none;margin-left:10px;">2FA Enabled</span>
-      </div>
+        <div class="card">
+            <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg> Wallet Connection</h2>
+            <div id="wallet-not-connected" class="wallet-section">
+                <p style="margin-bottom:16px;">Connect your BlockDAG wallet to access utilities</p>
+                <button class="btn btn-wallet" onclick="connectWallet()">Connect Wallet</button>
+                <p id="wallet-status" style="margin-top:12px;font-size:0.85em;color:#8b949e;">No wallet detected</p>
+            </div>
+            <div id="wallet-connected" class="wallet-section" style="display:none;">
+                <div class="wallet-qr" id="qr-container"></div>
+                <div class="wallet-address" id="connected-address">0x...</div>
+                <div class="wallet-type-badge" id="wallet-type">Ethereum</div>
+                <div class="wallet-stats">
+                    <div class="wallet-stat"><div class="value" id="bdg-balance">0</div><div class="label">BDG Tokens</div></div>
+                    <div class="wallet-stat"><div class="value" id="total-utility-uses">0</div><div class="label">Utility Uses</div></div>
+                </div>
+                <div class="share-section">
+                    <h4 style="color:#00d4ff;margin-bottom:12px;">Share Your Wallet</h4>
+                    <div class="share-input-group">
+                        <input type="text" id="share-input" placeholder="Enter custom text to encode in QR">
+                        <button class="btn btn-share" onclick="generateShareQR()">Generate QR</button>
+                    </div>
+                    <div class="qr-preview" id="qr-preview" style="display:none;">
+                        <div id="qr-share-container"></div>
+                        <button class="btn btn-secondary" onclick="copyShareLink()">Copy to Clipboard</button>
+                    </div>
+                </div>
+                <button class="btn btn-danger" onclick="disconnectWallet()" style="margin-top:16px;">Disconnect</button>
+            </div>
+        </div>
+        <div class="card">
+            <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> Utilities</h2>
+            <div class="grid-3">
+                <div class="utility-card" onclick="useUtility('swap')"><div class="icon">🔄</div><h4>Swap</h4><p>Exchange tokens on DEX</p></div>
+                <div class="utility-card" onclick="bridgeUniswap()"><div class="icon">🌊</div><h4>Bridge</h4><p>Bridge via Uniswap</p></div>
+                <div class="utility-card" onclick="useUtility('governance')"><div class="icon">🗣</div><h4>Governance</h4><p>Vote on proposals</p></div>
+                <div class="utility-card" onclick="useUtility('nft')"><div class="icon">🎨</div><h4>NFT Gallery</h4><p>View your NFT collection</p></div>
+                <div class="utility-card" onclick="useUtility('analytics')"><div class="icon">📊</div><h4>Analytics</h4><p>Track portfolio performance</p></div>
+            </div>
+        </div>
+        <div class="card">
+            <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verification Status</h2>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span>Email Verified</span><span id="email-verified" class="badge badge-pending">Pending</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span>Phone Verified</span><span id="phone-verified" class="badge badge-pending">Pending</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;"><span>Wallet Connected</span><span id="wallet-verified" class="badge badge-pending">Pending</span></div>
+            </div>
+            <button class="btn btn-verify" onclick="verifyAll()" style="margin-top:16px;width:100%;">Verify All Credentials</button>
+        </div>
+        <div class="card">
+            <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Activity Log</h2>
+            <div class="activity-log" id="activity-log"></div>
+        </div>
     </div>
-
-    <div class="card">
-      <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 18v1c0 1.1-.9 2-2 2H5c-1.11 0-2-.9-2-2V5c0-1.1.89-2 2-2h14c1.1 0 2 .9 2 2v1h-9c-1.11 0-2 .9-2 2v8c0 1.1.89 2 2 2h9zm-9-2h10V8H12v8zm4-2.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg> Wallet Connection</h2>
-      <div id="wallet-not-connected" class="wallet-section">
-        <p style="margin-bottom:16px;">Connect your BlockDAG wallet to access utilities</p>
-        <button class="btn btn-wallet" onclick="connectWallet()">Connect Wallet</button>
-        <p id="wallet-status" style="margin-top:12px;font-size:0.85em;color:#8b949e;">No wallet detected</p>
-      </div>
-      <div id="wallet-connected" class="wallet-section" style="display:none;">
-        <div class="wallet-qr" id="qr-container"></div>
-        <div class="wallet-address" id="connected-address">0x...</div>
-        <div class="wallet-type-badge" id="wallet-type">Ethereum</div>
-        <div class="wallet-stats">
-          <div class="wallet-stat"><div class="value" id="bdg-balance">0</div><div class="label">BDG Tokens</div></div>
-          <div class="wallet-stat"><div class="value" id="total-utility-uses">0</div><div class="label">Utility Uses</div></div>
+    <div class="notification hidden" id="notification"><span id="notif-icon">✓</span><span id="notif-message">Success</span></div>
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">×</span>
+            <h3 id="modal-title" style="margin-bottom:16px;">Modal Title</h3>
+            <div id="modal-body"></div>
         </div>
-        <button class="btn btn-danger" onclick="disconnectWallet()" style="margin-top:16px;">Disconnect</button>
-      </div>
     </div>
-
-    <div class="card">
-      <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg> Utilities</h2>
-      <div class="grid-3">
-        <div class="utility-card" onclick="useUtility('swap')">
-          <div class="icon">&#128260;</div>
-          <h4>Swap</h4>
-          <p>Exchange tokens on DEX</p>
-        </div>
-        <div class="utility-card" onclick="bridgeUniswap()">
-          <div class="icon">&#127754;</div>
-          <h4>Bridge</h4>
-          <p>Bridge via Uniswap</p>
-        </div>
-        <div class="utility-card" onclick="useUtility('governance')">
-          <div class="icon">&#128483;</div>
-          <h4>Governance</h4>
-          <p>Vote on proposals</p>
-        </div>
-        <div class="utility-card" onclick="useUtility('nft')">
-          <div class="icon">&#127912;</div>
-          <h4>NFT Gallery</h4>
-          <p>View your NFT collection</p>
-        </div>
-        <div class="utility-card" onclick="useUtility('analytics')">
-          <div class="icon">&#128202;</div>
-          <h4>Analytics</h4>
-          <p>Track portfolio performance</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg> Verification Status</h2>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        <div style="display:flex;justify-content:space-between;align-items:center;"><span>Email Verified</span><span id="email-verified" class="badge badge-pending">Pending</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;"><span>Phone Verified</span><span id="phone-verified" class="badge badge-pending">Pending</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;"><span>Wallet Connected</span><span id="wallet-verified" class="badge badge-pending">Pending</span></div>
-      </div>
-      <button class="btn btn-verify" onclick="verifyAll()" style="margin-top:16px;width:100%;">Verify All Credentials</button>
-    </div>
-
-    <div class="card">
-      <h2 class="card-title"><svg class="icon" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg> Activity Log</h2>
-      <div class="activity-log" id="activity-log"></div>
-    </div>
-
-  </div>
-
-  <div class="notification hidden" id="notification">
-    <span id="notif-icon">&#10003;</span>
-    <span id="notif-message">Success</span>
-  </div>
-
-  <div class="modal" id="modal">
-    <div class="modal-content">
-      <span class="modal-close" onclick="closeModal()">&times;</span>
-      <h3 id="modal-title" style="margin-bottom:16px;">Modal Title</h3>
-      <div id="modal-body"></div>
-    </div>
-  </div>
-
-  <script>
-  const state = {
-    displayName: '',
-    walletAddress: '',
-    walletConnected: false,
-    walletType: '',
-    email2FA: '',
-    phone2FA: '',
-    twoFactorEnabled: false,
-    emailVerified: false,
-    phoneVerified: false,
-    bdgBalance: 0,
-    utilityUses: 0
-  };
-
-  function init() {
-    loadState();
-    createStars();
-    createParticles();
-    checkWalletInstalled();
-    updateUI();
-  }
-
-  function saveState() {
-    localStorage.setItem('blockdagPassport', JSON.stringify(state));
-  }
-
-  function loadState() {
-    const saved = localStorage.getItem('blockdagPassport');
-    if (saved) {
-      const loaded = JSON.parse(saved);
-      Object.assign(state, loaded);
-    }
-    document.getElementById('display-name').value = state.displayName;
-    document.getElementById('wallet-address').value = state.walletAddress || '';
-    document.getElementById('2fa-email').value = state.email2FA;
-    document.getElementById('2fa-phone').value = state.phone2FA;
-  }
-
-  function createStars() {
-    const starsContainer = document.getElementById('stars');
-    for (let i = 0; i < 100; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.animationDelay = Math.random() * 3 + 's';
-      star.style.width = Math.random() * 3 + 1 + 'px';
-      star.style.height = star.style.width;
-      starsContainer.appendChild(star);
-    }
-  }
-
-  function createParticles() {
-    const particlesContainer = document.getElementById('particles');
-    for (let i = 0; i < 30; i++) {
-      const particle = document.createElement('div');
-      particle.className = 'particle';
-      particle.style.left = Math.random() * 100 + '%';
-      particle.style.animationDelay = Math.random() * 15 + 's';
-      particle.style.animationDuration = 15 + Math.random() * 10 + 's';
-      particlesContainer.appendChild(particle);
-    }
-  }
-
-  function checkWalletInstalled() {
-    const statusEl = document.getElementById('wallet-status');
-    if (typeof window.ethereum !== 'undefined') {
-      statusEl.textContent = 'MetaMask / Ethereum wallet detected';
-      statusEl.style.color = '#2ed573';
-    } else if (typeof window.BlockDAGWallet !== 'undefined') {
-      statusEl.textContent = 'BlockDAG wallet detected';
-      statusEl.style.color = '#2ed573';
-    } else {
-      statusEl.textContent = 'No wallet detected - install MetaMask or a Web3 wallet';
-      statusEl.style.color = '#ff9500';
-    }
-  }
-
-  function showNotification(message, icon) {
-    const notif = document.getElementById('notification');
-    document.getElementById('notif-message').textContent = message;
-    document.getElementById('notif-icon').textContent = icon || '&#10003;';
-    notif.classList.remove('hidden');
-    setTimeout(() => notif.classList.add('hidden'), 3000);
-  }
-
-  function logActivity(text) {
-    const log = document.getElementById('activity-log');
-    const item = document.createElement('div');
-    item.className = 'activity-item';
-    const time = new Date().toLocaleTimeString();
-    item.textContent = '[' + time + '] ' + text;
-    log.insertBefore(item, log.firstChild);
-  }
-
-  function saveProfile() {
-    state.displayName = document.getElementById('display-name').value;
-    saveState();
-    document.getElementById('profile-saved').style.display = 'inline-block';
-    setTimeout(() => document.getElementById('profile-saved').style.display = 'none', 2000);
-    showNotification('Profile saved!');
-    logActivity('Profile updated');
-  }
-
-  function enable2FA() {
-    state.email2FA = document.getElementById('2fa-email').value;
-    state.phone2FA = document.getElementById('2fa-phone').value;
-    if (state.email2FA && state.phone2FA) {
-      state.twoFactorEnabled = true;
-      saveState();
-      showNotification('2FA enabled successfully!');
-      logActivity('2FA enabled');
-    } else {
-      showNotification('Please enter both email and phone', '&#9888;');
-    }
-  }
-
-  async function connectWallet() {
-    const statusEl = document.getElementById('wallet-status');
-    if (typeof window.ethereum !== 'undefined') {
-      try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const address = accounts[0];
-        state.walletAddress = address;
-        state.walletType = 'MetaMask / Ethereum';
-        state.walletConnected = true;
-        state.bdgBalance = Math.floor(Math.random() * 10000) + 500;
-        saveState();
-        showNotification('Wallet connected!');
-        logActivity('Wallet connected: ' + address.substring(0, 10) + '...');
-        updateUI();
-      } catch (error) {
-        showNotification('Connection rejected', '&#9888;');
-        logActivity('Wallet connection rejected');
-      }
-    } else if (typeof window.BlockDAGWallet !== 'undefined') {
-      try {
-        const address = await window.BlockDAGWallet.connect();
-        state.walletAddress = address;
-        state.walletType = 'BlockDAG Wallet';
-        state.walletConnected = true;
-        state.bdgBalance = Math.floor(Math.random() * 10000) + 500;
-        saveState();
-        showNotification('BlockDAG Wallet connected!');
-        logActivity('BlockDAG Wallet connected: ' + address.substring(0, 10) + '...');
-        updateUI();
-      } catch (error) {
-        showNotification('Connection rejected', '&#9888;');
-        logActivity('BlockDAG Wallet connection rejected');
-      }
-    } else {
-      const addr = state.walletAddress || '0x' + Math.random().toString(16).substr(2, 40);
-      state.walletAddress = addr;
-      state.walletType = 'Simulated';
-      state.walletConnected = true;
-      state.bdgBalance = Math.floor(Math.random() * 10000) + 500;
-      saveState();
-      showNotification('Wallet connected (simulated)');
-      logActivity('Simulated wallet connected: ' + addr.substring(0, 10) + '...');
-      updateUI();
-    }
-  }
-
-  function disconnectWallet() {
-    state.walletConnected = false;
-    state.bdgBalance = 0;
-    saveState();
-    showNotification('Wallet disconnected');
-    logActivity('Wallet disconnected');
-    updateUI();
-  }
-
-  function useUtility(name) {
-    if (!state.walletConnected) {
-      showNotification('Connect wallet first!', '&#9888;');
-      return;
-    }
-    const utilities = {
-      swap: 'Swap interface opened',
-      bridge: 'Bridge interface opened',
-      governance: 'Governance dashboard opened',
-      nft: 'NFT Gallery opened',
-      analytics: 'Analytics dashboard opened'
-    };
-    state.utilityUses++;
-    saveState();
-    showNotification(utilities[name] || 'Utility opened');
-    logActivity('Used ' + name + ' utility');
-    updateUI();
-  }
-
-  function verifyAll() {
-    let allVerified = true;
-    if (state.email2FA) {
-      state.emailVerified = true;
-    } else {
-      allVerified = false;
-    }
-    if (state.phone2FA) {
-      state.phoneVerified = true;
-    } else {
-      allVerified = false;
-    }
-    if (!state.walletConnected) {
-      allVerified = false;
-    }
-    saveState();
-    if (allVerified) {
-      showNotification('All credentials verified!', '&#128737;');
-      logActivity('All credentials verified');
-    } else {
-      showNotification('Please complete all fields first', '&#9888;');
-    }
-    updateUI();
-  }
-
-  function generateQRCode(address) {
-    const qrContainer = document.getElementById('qr-container');
-    const shortAddr = address.substring(0, 10) + '...';
-    qrContainer.innerHTML = '<div style="font-weight:bold;font-size:18px;color:#000;">' + shortAddr + '</div><div style="font-size:12px;color:#666;margin-top:4px;">QR Code</div>';
-  }
-
-  function updateUI() {
-    document.getElementById('bdg-balance').textContent = state.bdgBalance.toLocaleString();
-    document.getElementById('total-utility-uses').textContent = state.utilityUses.toLocaleString();
-    const walletNotConnected = document.getElementById('wallet-not-connected');
-    const walletConnected = document.getElementById('wallet-connected');
-    if (state.walletConnected) {
-      walletNotConnected.style.display = 'none';
-      walletConnected.style.display = 'block';
-      document.getElementById('connected-address').textContent = state.walletAddress;
-      document.getElementById('wallet-address').value = state.walletAddress;
-      document.getElementById('wallet-type').textContent = state.walletType || 'Ethereum';
-      generateQRCode(state.walletAddress);
-      document.getElementById('wallet-verified').className = 'badge badge-success';
-      document.getElementById('wallet-verified').textContent = 'Connected';
-    } else {
-      walletNotConnected.style.display = 'block';
-      walletConnected.style.display = 'none';
-      document.getElementById('wallet-verified').className = 'badge badge-pending';
-      document.getElementById('wallet-verified').textContent = 'Pending';
-    }
-    document.getElementById('email-verified').className = state.emailVerified ? 'badge badge-success' : 'badge badge-pending';
-    document.getElementById('email-verified').textContent = state.emailVerified ? 'Verified' : 'Pending';
-    document.getElementById('phone-verified').className = state.phoneVerified ? 'badge badge-success' : 'badge badge-pending';
-    document.getElementById('phone-verified').textContent = state.phoneVerified ? 'Verified' : 'Pending';
-    document.getElementById('2fa-status').style.display = state.twoFactorEnabled ? 'inline-block' : 'none';
-  }
-
-  function closeModal() {
-    document.getElementById('modal').classList.remove('active');
-  }
-
-  function openModal(title, content) {
-    document.getElementById('modal-title').textContent = title;
-    document.getElementById('modal-body').innerHTML = content;
-    document.getElementById('modal').classList.add('active');
-  }
-
-  function bridgeUniswap() {
-    if (!state.walletConnected) {
-      showNotification('Connect wallet first!', '&#9888;');
-      return;
-    }
-    const content = '<div style="text-align:center;"><p style="margin-bottom:20px;">Bridge your BDG tokens via Uniswap</p><div class="input-group"><label>Amount</label><input type="number" id="bridge-amount" placeholder="0" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e6edf3;"></div><div class="input-group"><label>From</label><select id="bridge-from" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e6edf3;"><option>BDG (BlockDAG)</option><option>ETH</option></select></div><div class="input-group"><label>To</label><select id="bridge-to" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e6edf3;"><option>ETH</option><option>BDG (BlockDAG)</option></select></div><button class="btn" onclick="executeBridge()" style="width:100%;">Bridge via Uniswap</button><p style="font-size:0.8em;color:#8b949e;margin-top:12px;">Powered by Uniswap Protocol</p></div>';
-    openModal('Uniswap Bridge', content);
-  }
-
-  function executeBridge() {
-    const amount = document.getElementById('bridge-amount').value;
-    const from = document.getElementById('bridge-from').value;
-    const to = document.getElementById('bridge-to').value;
-    if (!amount || amount <= 0) {
-      showNotification('Please enter a valid amount', '&#9888;');
-      return;
-    }
-    closeModal();
-    showNotification('Bridge initiated: ' + amount + ' ' + from + ' &#8594; ' + to, '&#127754;');
-    logActivity('Bridge: ' + amount + ' ' + from + ' to ' + to + ' via Uniswap');
-  }
-
-  init();
-  </script>
+    <script>
+        const state = {
+            displayName: '',
+            walletAddress: '',
+            walletConnected: false,
+            walletType: '',
+            email2FA: '',
+            phone2FA: '',
+            twoFactorEnabled: false,
+            emailVerified: false,
+            phoneVerified: false,
+            bdgBalance: 0,
+            utilityUses: 0,
+            shareText: ''
+        };
+        let qrCodeInstance = null;
+        let shareQRCode = null;
+        function init() {
+            loadState();
+            createStars();
+            createParticles();
+            checkWalletInstalled();
+            updateUI();
+        }
+        function saveState() {
+            localStorage.setItem('blockdagPassport', JSON.stringify(state));
+        }
+        function loadState() {
+            const saved = localStorage.getItem('blockdagPassport');
+            if (saved) {
+                const loaded = JSON.parse(saved);
+                Object.assign(state, loaded);
+            }
+            document.getElementById('display-name').value = state.displayName;
+            document.getElementById('wallet-address').value = state.walletAddress || '';
+            document.getElementById('2fa-email').value = state.email2FA;
+            document.getElementById('2fa-phone').value = state.phone2FA;
+            document.getElementById('share-input').value = state.shareText || '';
+        }
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.width = Math.random() * 3 + 1 + 'px';
+                star.style.height = star.style.width;
+                starsContainer.appendChild(star);
+            }
+        }
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = 15 + Math.random() * 10 + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        function checkWalletInstalled() {
+            const statusEl = document.getElementById('wallet-status');
+            if (typeof window.ethereum !== 'undefined') {
+                statusEl.textContent = 'MetaMask / Ethereum wallet detected';
+                statusEl.style.color = '#2ed573';
+            } else if (typeof window.BlockDAGWallet !== 'undefined') {
+                statusEl.textContent = 'BlockDAG wallet detected';
+                statusEl.style.color = '#2ed573';
+            } else {
+                statusEl.textContent = 'No wallet detected - install MetaMask or a Web3 wallet';
+                statusEl.style.color = '#ff9500';
+            }
+        }
+        function showNotification(message, icon) {
+            const notif = document.getElementById('notification');
+            document.getElementById('notif-message').textContent = message;
+            document.getElementById('notif-icon').textContent = icon || '✓';
+            notif.classList.remove('hidden');
+            setTimeout(() => notif.classList.add('hidden'), 3000);
+        }
+        function logActivity(text) {
+            const log = document.getElementById('activity-log');
+            const item = document.createElement('div');
+            item.className = 'activity-item';
+            const time = new Date().toLocaleTimeString();
+            item.textContent = '[' + time + '] ' + text;
+            log.insertBefore(item, log.firstChild);
+        }
+        function saveProfile() {
+            state.displayName = document.getElementById('display-name').value;
+            saveState();
+            document.getElementById('profile-saved').style.display = 'inline-block';
+            setTimeout(() => document.getElementById('profile-saved').style.display = 'none', 2000);
+            showNotification('Profile saved!');
+            logActivity('Profile updated');
+        }
+        function enable2FA() {
+            state.email2FA = document.getElementById('2fa-email').value;
+            state.phone2FA = document.getElementById('2fa-phone').value;
+            if (state.email2FA && state.phone2FA) {
+                state.twoFactorEnabled = true;
+                saveState();
+                showNotification('2FA enabled successfully!');
+                logActivity('2FA enabled');
+            } else {
+                showNotification('Please enter both email and phone', '⚠');
+            }
+        }
+        async function connectWallet() {
+            const statusEl = document.getElementById('wallet-status');
+            if (typeof window.ethereum !== 'undefined') {
+                try {
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    const address = accounts[0];
+                    state.walletAddress = address;
+                    state.walletType = 'MetaMask / Ethereum';
+                    state.walletConnected = true;
+                    state.bdgBalance = Math.floor(Math.random() * 10000) + 500;
+                    saveState();
+                    showNotification('Wallet connected!');
+                    logActivity('Wallet connected: ' + address.substring(0, 10) + '...');
+                    updateUI();
+                } catch (error) {
+                    showNotification('Connection rejected', '⚠');
+                    logActivity('Wallet connection rejected');
+                }
+            } else if (typeof window.BlockDAGWallet !== 'undefined') {
+                try {
+                    const address = await window.BlockDAGWallet.connect();
+                    state.walletAddress = address;
+                    state.walletType = 'BlockDAG Wallet';
+                    state.walletConnected = true;
+                    state.bdgBalance = Math.floor(Math.random() * 10000) + 500;
+                    saveState();
+                    showNotification('BlockDAG Wallet connected!');
+                    logActivity('BlockDAG Wallet connected: ' + address.substring(0, 10) + '...');
+                    updateUI();
+                } catch (error) {
+                    showNotification('Connection rejected', '⚠');
+                    logActivity('BlockDAG Wallet connection rejected');
+                }
+            } else {
+                const addr = state.walletAddress || '0x' + Math.random().toString(16).substr(2, 40);
+                state.walletAddress = addr;
+                state.walletType = 'Simulated';
+                state.walletConnected = true;
+                state.bdgBalance = Math.floor(Math.random() * 10000) + 500;
+                saveState();
+                showNotification('Wallet connected (simulated)');
+                logActivity('Simulated wallet connected: ' + addr.substring(0, 10) + '...');
+                updateUI();
+            }
+        }
+        function disconnectWallet() {
+            state.walletConnected = false;
+            state.bdgBalance = 0;
+            saveState();
+            showNotification('Wallet disconnected');
+            logActivity('Wallet disconnected');
+            updateUI();
+        }
+        function useUtility(name) {
+            if (!state.walletConnected) {
+                showNotification('Connect wallet first!', '⚠');
+                return;
+            }
+            const utilities = { swap: 'Swap interface opened', bridge: 'Bridge interface opened', governance: 'Governance dashboard opened', nft: 'NFT Gallery opened', analytics: 'Analytics dashboard opened' };
+            state.utilityUses++;
+            saveState();
+            showNotification(utilities[name] || 'Utility opened');
+            logActivity('Used ' + name + ' utility');
+            updateUI();
+        }
+        function verifyAll() {
+            let allVerified = true;
+            if (state.email2FA) { state.emailVerified = true; } else { allVerified = false; }
+            if (state.phone2FA) { state.phoneVerified = true; } else { allVerified = false; }
+            if (!state.walletConnected) { allVerified = false; }
+            saveState();
+            if (allVerified) { showNotification('All credentials verified!', '🛡'); logActivity('All credentials verified'); }
+            else { showNotification('Please complete all fields first', '⚠'); }
+            updateUI();
+        }
+        function generateWalletQR(address) {
+            const qrContainer = document.getElementById('qr-container');
+            qrContainer.innerHTML = '';
+            if (typeof QRCode !== 'undefined') {
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: address,
+                    width: 180,
+                    height: 180,
+                    colorDark: '#000000',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } else {
+                const shortAddr = address.substring(0, 10) + '...';
+                qrContainer.innerHTML = '<div style="font-weight:bold;font-size:18px;color:#000;">' + shortAddr + '</div><div style="font-size:12px;color:#666;margin-top:4px;">Install QR library</div>';
+            }
+        }
+        function generateShareQR() {
+            const shareText = document.getElementById('share-input').value.trim();
+            if (!shareText) {
+                showNotification('Please enter text to encode', '⚠');
+                return;
+            }
+            state.shareText = shareText;
+            saveState();
+            const preview = document.getElementById('qr-preview');
+            const shareContainer = document.getElementById('qr-share-container');
+            shareContainer.innerHTML = '';
+            if (typeof QRCode !== 'undefined') {
+                shareQRCode = new QRCode(shareContainer, {
+                    text: shareText,
+                    width: 200,
+                    height: 200,
+                    colorDark: '#00d4ff',
+                    colorLight: '#ffffff',
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+            preview.style.display = 'flex';
+            showNotification('Share QR generated!');
+            logActivity('Generated share QR for: ' + shareText.substring(0, 20) + '...');
+        }
+        function copyShareLink() {
+            const shareText = state.shareText;
+            navigator.clipboard.writeText(shareText).then(function() {
+                showNotification('Copied to clipboard!');
+                logActivity('Copied share link to clipboard');
+            }).catch(function() {
+                showNotification('Failed to copy', '⚠');
+            });
+        }
+        function closeIntro() {
+            const overlay = document.getElementById('introOverlay');
+            overlay.style.opacity = '0';
+            overlay.style.pointerEvents = 'none';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
+            logActivity('Entered BlockDAG Passport');
+        }
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+        function openModal(title, content) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('modal').classList.add('active');
+        }
+        function bridgeUniswap() {
+            if (!state.walletConnected) {
+                showNotification('Connect wallet first!', '⚠');
+                return;
+            }
+            const content = '<div style="text-align:center;"><p style="margin-bottom:20px;">Bridge your BDG tokens via Uniswap</p><div class="input-group"><label>Amount</label><input type="number" id="bridge-amount" placeholder="0" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e6edf3;"></div><div class="input-group"><label>From</label><select id="bridge-from" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e6edf3;"><option>BDG (BlockDAG)</option><option>ETH</option></select></div><div class="input-group"><label>To</label><select id="bridge-to" style="width:100%;padding:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#e6edf3;"><option>ETH</option><option>BDG (BlockDAG)</option></select></div><button class="btn" onclick="executeBridge()" style="width:100%;">Bridge via Uniswap</button><p style="font-size:0.8em;color:#8b949e;margin-top:12px;">Powered by Uniswap Protocol</p></div>';
+            openModal('Uniswap Bridge', content);
+        }
+        function executeBridge() {
+            const amount = document.getElementById('bridge-amount').value;
+            const from = document.getElementById('bridge-from').value;
+            const to = document.getElementById('bridge-to').value;
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', '⚠');
+                return;
+            }
+            closeModal();
+            showNotification('Bridge initiated: ' + amount + ' ' + from + ' → ' + to, '🌊');
+            logActivity('Bridge: ' + amount + ' ' + from + ' to ' + to + ' via Uniswap');
+        }
+        function updateUI() {
+            document.getElementById('bdg-balance').textContent = state.bdgBalance.toLocaleString();
+            document.getElementById('total-utility-uses').textContent = state.utilityUses.toLocaleString();
+            const walletNotConnected = document.getElementById('wallet-not-connected');
+            const walletConnected = document.getElementById('wallet-connected');
+            if (state.walletConnected) {
+                walletNotConnected.style.display = 'none';
+                walletConnected.style.display = 'block';
+                document.getElementById('connected-address').textContent = state.walletAddress;
+                document.getElementById('wallet-address').value = state.walletAddress;
+                document.getElementById('wallet-type').textContent = state.walletType || 'Ethereum';
+                generateWalletQR(state.walletAddress);
+                document.getElementById('wallet-verified').className = 'badge badge-success';
+                document.getElementById('wallet-verified').textContent = 'Connected';
+            } else {
+                walletNotConnected.style.display = 'block';
+                walletConnected.style.display = 'none';
+                document.getElementById('wallet-verified').className = 'badge badge-pending';
+                document.getElementById('wallet-verified').textContent = 'Pending';
+            }
+            document.getElementById('email-verified').className = state.emailVerified ? 'badge badge-success' : 'badge badge-pending';
+            document.getElementById('email-verified').textContent = state.emailVerified ? 'Verified' : 'Pending';
+            document.getElementById('phone-verified').className = state.phoneVerified ? 'badge badge-success' : 'badge badge-pending';
+            document.getElementById('phone-verified').textContent = state.phoneVerified ? 'Verified' : 'Pending';
+            document.getElementById('2fa-status').style.display = state.twoFactorEnabled ? 'inline-block' : 'none';
+        }
+        init();
+    </script>
 </body>
 </html>
