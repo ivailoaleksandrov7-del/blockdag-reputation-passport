@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlockDAG Reputation Passport v3.0</title>
+    <meta name="description" content="Dynamic reputation scoring system for BlockDAG ecosystem participants">
+    <meta property="og:title" content="BlockDAG Reputation Passport">
+    <meta property="og:description" content="Dynamic reputation scoring for BlockDAG ecosystem">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="BlockDAG Reputation Passport">
+    <meta name="twitter:description" content="Verify your BlockDAG reputation score">
+    <meta name="twitter:image" content="https://blockdag.network/logo.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .container { max-width: 650px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; padding: 40px 20px; }
+        .header h1 { font-size: 28px; color: #00d4ff; margin-bottom: 10px; }
+        .header p { color: #888; font-size: 14px; }
+        .logo { width: 80px; height: 80px; margin: 0 auto 20px; display: block; }
+        .card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 16px 0;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .card h2 { font-size: 18px; color: #00d4ff; margin-bottom: 12px; }
+        .card p { color: #aaa; font-size: 14px; line-height: 1.6; }
+        .badge {
+            display: inline-block;
+            background: rgba(0,212,255,0.15);
+            color: #00d4ff;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+        .trust-score {
+            font-size: 48px;
+            font-weight: 700;
+            color: #00d4ff;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .progress-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            height: 12px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            background: linear-gradient(90deg, #00d4ff, #00ff88);
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+        .stat {
+            background: rgba(0,212,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-value { font-size: 24px; font-weight: 700; color: #00d4ff; }
+        .stat-label { font-size: 12px; color: #888; margin-top: 4px; }
+        .btn {
+            display: block;
+            width: 100%;
+            background: linear-gradient(135deg, #00d4ff, #00ff88);
+            color: #000;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,212,255,0.3); }
+        .btn:active { transform: translateY(0); }
+        .btn-secondary {
+            background: rgba(255,255,255,0.1);
+            color: #fff;
+        }
+        .btn-danger {
+            background: rgba(255,80,80,0.2);
+            color: #ff5050;
+            border: 1px solid rgba(255,80,80,0.3);
+        }
+        .btn-wallet {
+            background: linear-gradient(135deg, #5865F2, #7289da);
+            color: #fff;
+        }
+        .quest-list { list-style: none; }
+        .quest-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .quest-item:last-child { border-bottom: none; }
+        .quest-check {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #00d4ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #00d4ff;
+            font-weight: 700;
+        }
+        .quest-check.done {
+            background: #00d4ff;
+            color: #000;
+        }
+        .wallet-section {
+            text-align: center;
+            padding: 20px;
+        }
+        .wallet-qr {
+            width: 180px;
+            height: 180px;
+            background: #fff;
+            margin: 20px auto;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 14px;
+        }
+        .twofa-section { text-align: center; }
+        .twofa-input {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 16px;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .twofa-input:focus { outline: none; border-color: #00d4ff; }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,212,255,0.2);
+            border: 1px solid #00d4ff;
+            color: #00d4ff;
+            padding: 12px 24px;
+            border-radius: 12px;
+            z-index: 1000;
+            transition: opacity 0.3s;
+        }
+        .notification.hidden { opacity: 0; pointer-events: none; }
+        .activity-log {
+            font-size: 13px;
+            color: #888;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .activity-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .activity-item:last-child { border-bottom: none; }
+        .activity-time { color: #555; font-size: 11px; }
+        .profile-section { scroll-margin-top: 20px; }
+        .hidden { display: none !important; }
+        .connected-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(0,255,136,0.15);
+            color: #00ff88;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            margin-top: 10px;
+        }
+        .connected-dot {
+            width: 8px;
+            height: 8px;
+            background: #00ff88;
+            border-radius: 50%;
+        }
+        .bdag-amount {
+            font-size: 20px;
+            font-weight: 700;
+            color: #00ff88;
+        }
+        @media (max-width: 500px) {
+            .header h1 { font-size: 24px; }
+            .trust-score { font-size: 40px; }
+            .stats { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification hidden" id="notification">Action completed!</div>
+    <div class="container">
+        <div class="header">
+            <svg class="logo" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="48" fill="#00d4ff" opacity="0.2"/>
+                <circle cx="50" cy="50" r="38" fill="none" stroke="#00d4ff" stroke-width="3"/>
+                <text x="50" y="58" text-anchor="middle" fill="#00d4ff" font-size="24" font-weight="700">BD</text>
+            </svg>
+            <h1>BlockDAG Reputation Passport</h1>
+            <p>Dynamic reputation scoring for BlockDAG ecosystem participants</p>
+            <p style="color:#555;font-size:12px;margin-top:8px;">Prototype v3.0</p>
+        </div>
+        <div class="card">
+            <div style="text-align:center;">
+                <h2>Reputation Score</h2>
+                <div class="trust-score" id="trustScore">0%</div>
+                <div id="rankBadge" class="badge">Unranked</div>
+                <div id="connectedStatus" class="connected-badge hidden">
+                    <span class="connected-dot"></span>
+                    <span>Wallet Connected</span>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+            <p style="text-align:center;color:#888;font-size:13px;">Level Progress: <span id="levelProgress">0/100</span></p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value" id="verifiedActions">0</div>
+                    <div class="stat-label">Verified Actions</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="bdagHeld">-</div>
+                    <div class="stat-label">BDAG Held</div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <h2>Verify Actions</h2>
+            <p>Complete actions to boost your reputation score</p>
+            <button class="btn" onclick="mineHash()">
+                Mine Hash +5 Trust
+            </button>
+            <button class="btn" onclick="holdBDAG()">
+                Hold BDAG +8 Trust
+            </button>
+            <button class="btn btn-wallet" id="connectWalletBtn" onclick="connectWallet()">
+                Connect Wallet +10 Trust
+            </button>
+        </div>
+        <div class="card wallet-section" id="walletSection">
+            <h2>Wallet Connect (QR)</h2>
+            <p>Scan with Trust Wallet, MetaMask, or any WalletConnect-compatible wallet</p>
+            <div class="wallet-qr">
+                <span style="text-align:center;padding:10px;">[QR Code]<br>WalletConnect<br>URI Display</span>
+            </div>
+            <p style="color:#555;font-size:12px;">Connect your wallet to display BDAG holdings & rank</p>
+            <button class="btn btn-wallet" onclick="connectWallet()">Connect Wallet</button>
+        </div>
+        <div class="card twofa-section" id="twofaSection">
+            <h2>Two-Factor Authentication</h2>
+            <p>Secure your reputation passport with 2FA verification</p>
+            <input type="email" class="twofa-input" id="twofaEmail" placeholder="Enter your email address">
+            <input type="tel" class="twofa-input" id="twofaPhone" placeholder="Enter your phone number">
+            <input type="text" class="twofa-input" id="twofaCode" placeholder="Enter verification code (6 digits)">
+            <button class="btn" onclick="verifyTwoFA()">Verify & Enable 2FA</button>
+            <p id="twofaStatus" style="color:#888;font-size:13px;margin-top:10px;">2FA Status: Not enabled</p>
+        </div>
+        <div class="card" id="questsSection">
+            <h2>Daily Quests</h2>
+            <p>Complete quests for bonus reputation points</p>
+            <ul class="quest-list">
+                <li class="quest-item">
+                    <span>Connect Wallet</span>
+                    <span class="quest-check" id="quest1">+</span>
+                </li>
+                <li class="quest-item">
+                    <span>Hold BDAG (25,000+)</span>
+                    <span class="quest-check" id="quest2">+</span>
+                </li>
+                <li class="quest-item">
+                    <span>Complete 5 Verified Actions</span>
+                    <span class="quest-check" id="quest3">+</span>
+                </li>
+                <li class="quest-item">
+                    <span>Enable 2FA Security</span>
+                    <span class="quest-check" id="quest4">+</span>
+                </li>
+                <li class="quest-item">
+                    <span>Reach Level 3 (70+ Score)</span>
+                    <span class="quest-check" id="quest5">+</span>
+                </li>
+            </ul>
+        </div>
+        <div class="card" id="activitySection">
+            <h2>Activity Log</h2>
+            <div class="activity-log" id="activityLog">
+                <div class="activity-item">
+                    <span>No activity yet. Start mining!</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card profile-section" id="profileSection">
+            <h2>Full Profile</h2>
+            <div class="stats" style="grid-template-columns: 1fr 1fr;">
+                <div class="stat">
+                    <div class="stat-value" id="memberSince">-</div>
+                    <div class="stat-label">Member Since</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="miningSessions">0</div>
+                    <div class="stat-label">Mining Sessions</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="referrals">0</div>
+                    <div class="stat-label">Referrals</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="governanceVotes">0</div>
+                    <div class="stat-label">Governance Votes</div>
+                </div>
+            </div>
+            <p style="color:#888;font-size:13px;text-align:center;margin-top:16px;">More profile features coming soon</p>
+        </div>
+        <div style="text-align:center;margin:30px 0;">
+            <button class="btn btn-danger" onclick="resetAll()" style="max-width:200px;margin:0 auto;">
+                Reset All Data
+            </button>
+        </div>
+
+        <div style="text-align:center;color:#555;font-size:12px;padding:20px 0;">
+            <p>BlockDAG Reputation Passport - Prototype v3.0</p>
+            <p>Built for the BlockDAG ecosystem</p>
+        </div>
+    </div>
+
+    <script>
+        const ranks = [
+            'Unranked',
+            'Bronze Miner',
+            'Silver Holder',
+            'Gold Validator',
+            'Platinum Whale',
+            'Diamond Legend'
+        ];
+
+        let state = {
+            trustScore: 0,
+            verifiedActions: 0,
+            miningSessions: 0,
+            referrals: 0,
+            governanceVotes: 0,
+            walletConnected: false,
+            walletAddress: '',
+            bdagHeld: '-',
+            twofaEnabled: false,
+            memberSince: '-',
+            quests: [false, false, false, false, false],
+            activityLog: []
+        };
+        function loadState() {
+            const saved = localStorage.getItem('bdagPassport_v3');
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    state = { ...state, ...parsed };
+                    if (!state.memberSince) {
+                        state.memberSince = new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+                    }
+                } catch (e) { console.error('Failed to load state:', e); }
+            }
+        }
+
+        function saveState() {
+            localStorage.setItem('bdagPassport_v3', JSON.stringify(state));
+        }
+
+        function addActivity(msg) {
+            const time = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            state.activityLog.unshift({ msg, time });
+            if (state.activityLog.length > 10) state.activityLog.pop();
+            renderActivityLog();
+            saveState();
+        }
+        function renderActivityLog() {
+            const log = document.getElementById('activityLog');
+            if (state.activityLog.length === 0) {
+                log.innerHTML = '<div class="activity-item"><span>No activity yet. Start mining!</span></div>';
+                return;
+            }
+            log.innerHTML = state.activityLog.map(a => 
+                '<div class="activity-item"><span>' + a.msg + '</span><br><span class="activity-time">' + a.time + '</span></div>'
+            ).join('');
+        }
+
+        function showNotification(msg) {
+            const notif = document.getElementById('notification');
+            notif.textContent = msg;
+            notif.classList.remove('hidden');
+            setTimeout(() => notif.classList.add('hidden'), 3000);
+        }
+
+        function updateUI() {
+            if (state.trustScore > 100) state.trustScore = 100;
+            document.getElementById('trustScore').textContent = state.trustScore + '%';
+            document.getElementById('verifiedActions').textContent = state.verifiedActions;
+            document.getElementById('bdagHeld').textContent = state.bdagHeld;
+            document.getElementById('miningSessions').textContent = state.miningSessions;
+            document.getElementById('referrals').textContent = state.referrals;
+            document.getElementById('governanceVotes').textContent = state.governanceVotes;
+            document.getElementById('memberSince').textContent = state.memberSince;
+            document.getElementById('progressFill').style.width = state.trustScore + '%';
+            document.getElementById('levelProgress').textContent = state.trustScore + '/100';
+            let rankIdx = 0;
+            if (state.trustScore >= 95) rankIdx = 5;
+            else if (state.trustScore >= 80) rankIdx = 4;
+            else if (state.trustScore >= 60) rankIdx = 3;
+            else if (state.trustScore >= 40) rankIdx = 2;
+            else if (state.trustScore >= 20) rankIdx = 1;
+            document.getElementById('rankBadge').textContent = ranks[rankIdx];
+
+            if (state.walletConnected) {
+                document.getElementById('connectedStatus').classList.remove('hidden');
+                document.getElementById('connectWalletBtn').textContent = 'Wallet Connected';
+                document.getElementById('connectWalletBtn').classList.add('btn-secondary');
+                document.getElementById('walletSection').classList.add('hidden');
+            }
+
+            updateQuests();
+            update2FAStatus();
+        }
+
+        function updateQuests() {
+            const checks = ['quest1', 'quest2', 'quest3', 'quest4', 'quest5'];
+            state.quests.forEach((done, i) => {
+                const el = document.getElementById(checks[i]);
+                if (done) { el.classList.add('done'); el.textContent = '\u2713'; }
+            });
+        }
+
+        function update2FAStatus() {
+            document.getElementById('twofaStatus').textContent = 
+                '2FA Status: ' + (state.twofaEnabled ? 'Enabled' : 'Not enabled');
+        }
+        function mineHash() {
+            state.trustScore = Math.min(100, state.trustScore + Math.floor(Math.random() * 5) + 1);
+            state.verifiedActions++;
+            state.miningSessions++;
+            updateUI();
+            showNotification('Hash mined! Trust Score boosted');
+            addActivity('Mined hash + trust points');
+            saveState();
+        }
+
+        function holdBDAG() {
+            state.trustScore = Math.min(100, state.trustScore + Math.floor(Math.random() * 8) + 2);
+            state.verifiedActions++;
+            state.bdagHeld = '25,000+';
+            updateUI();
+            showNotification('BDAG holding confirmed! Reputation boosted');
+            addActivity('Confirmed BDAG holding');
+            saveState();
+        }
+
+        function connectWallet() {
+            if (state.walletConnected) {
+                showNotification('Wallet already connected');
+                return;
+            }
+            state.walletConnected = true;
+            state.walletAddress = '0x' + Math.random().toString(16).substr(2, 10) + '...';
+            state.bdagHeld = '25,000+';
+            state.trustScore = Math.min(100, state.trustScore + 10);
+            state.verifiedActions++;
+            state.quests[0] = true;
+            updateUI();
+            showNotification('Wallet connected! Reputation +10');
+            addActivity('Connected wallet to passport');
+            saveState();
+        }
+        function verifyTwoFA() {
+            const email = document.getElementById('twofaEmail').value;
+            const phone = document.getElementById('twofaPhone').value;
+            const code = document.getElementById('twofaCode').value;
+            if (!email || !phone || code.length < 4) {
+                showNotification('Please fill all fields with valid data');
+                return;
+            }
+            state.twofaEnabled = true;
+            state.verifiedActions++;
+            state.trustScore = Math.min(100, state.trustScore + 15);
+            state.quests[3] = true;
+            updateUI();
+            showNotification('2FA enabled! Security boosted +15 trust');
+            addActivity('Enabled two-factor authentication');
+            saveState();
+        }
+
+        function resetAll() {
+            if (confirm('Are you sure? This will delete all your data.')) {
+                localStorage.removeItem('bdagPassport_v3');
+                state = {
+                    trustScore: 0, verifiedActions: 0, miningSessions: 0,
+                    referrals: 0, governanceVotes: 0, walletConnected: false,
+                    walletAddress: '', bdagHeld: '-', twofaEnabled: false,
+                    memberSince: new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }),
+                    quests: [false, false, false, false, false], activityLog: []
+                };
+                updateUI();
+                showNotification('All data reset');
+                addActivity('Reset all data');
+            }
+        }
+        // Initialize on page load
+        loadState();
+        updateUI();
+        renderActivityLog();
+
+        // Check quest completion dynamically
+        setInterval(() => {
+            if (state.verifiedActions >= 5 && !state.quests[2]) {
+                state.quests[2] = true;
+                updateUI();
+                showNotification('Quest completed: 5 Verified Actions!');
+                saveState();
+            }
+            if (state.trustScore >= 70 && !state.quests[4]) {
+                state.quests[4] = true;
+                updateUI();
+                showNotification('Quest completed: Level 3 Reached!');
+                saveState();
+            }
+            if (state.bdagHeld !== '-' && !state.quests[1]) {
+                state.quests[1] = true;
+                updateUI();
+                showNotification('Quest completed: BDAG Holder!');
+                saveState();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
